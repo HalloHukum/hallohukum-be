@@ -1,28 +1,35 @@
-// import { Request, Response, NextFunction } from "express";
-// // import { Consultation, User } from "../models";
+import { Response, NextFunction } from 'express';
+import { Request as ExpressRequest } from 'express'; // Renaming to avoid conflict
+import { IUser } from '../interfaces/user.interface';
 
-// export async function authorization(
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> {
-//   try {
-//     const id = parseInt(req.params.id);
-//     const userId = req.user.id;
+// Define AuthenticatedRequest interface
+export interface AuthenticatedRequest extends ExpressRequest {
+  user?: IUser; // IUser should have _id and role
+}
 
-//     // ! Response (404 - Not Found)
-//     // const consultation = await Consultation.findById(id);
-//     // if (!consultation) {
-//     //   throw { name: "NotFound", message: "Consultation not found" };
-//     // }
+export function authorizeRoles(allowedRoles: string[]) {
+  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user || !req.user.role) {
+        // Explicitly return to stop further execution in this path
+        return next({
+          name: "Unauthorized",
+          message: "User not authenticated or role missing",
+        });
+      }
 
-//     // ! Response (403 - Forbidden)
-//     // if (userId.toString() !== consultation.receiverId.toString()) {
-//     //   throw { name: "Forbidden", message: "You are not authorized" };
-//     // }
-
-//     next();
-//   } catch (err) {
-//     next(err);
-//   }
-// }
+      const userRole = req.user.role;
+      if (allowedRoles.includes(userRole)) {
+        next();
+      } else {
+        // Explicitly return to stop further execution in this path
+        return next({
+          name: "Forbidden",
+          message: "You do not have permission to access this resource",
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
+  };
+}

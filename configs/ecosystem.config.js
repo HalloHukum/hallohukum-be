@@ -2,20 +2,19 @@ module.exports = {
   apps: [
     {
       name: "hallohukum",
-      script: "./app.ts",
+      script: "./dist/app.js",
       env: {
         NODE_ENV: "production",
-        JWT_SECRET: "hallohukum",
-        PORT: 80,
-        MONGODB_URI:
-          "mongodb+srv://danizrafidz:PjKHfWYfmniyjPhM@danzen.0pe3p.mongodb.net/hallohukum",
-        GETSTREAM_API_KEY: "5zr932s5edbx",
-        GETSTREAM_API_SECRET: "55p7ef68j8pvbemsr5razze3uy43spb95sgz495axte36uux99vmp2e8gsc9f2w8",
-        REDIS_PASSWORD: "Xnd5u19fEXtUO5CtAa1cv5IQitMgKU26",
-        REDIS_PORT: "11668",
-        REDIS_HOST: "redis-11668.crce194.ap-seast-1-1.ec2.redns.redis-cloud.com",
-        EMAIL_USER: "hallohukumprojects@gmail.com",
-        EMAIL_PASSWORD: "lbzxwimrglssmjcs"
+        JWT_SECRET: process.env.JWT_SECRET,
+        PORT: process.env.PORT,
+        MONGODB_URI: process.env.MONGODB_URI,
+        GETSTREAM_API_KEY: process.env.GETSTREAM_API_KEY,
+        GETSTREAM_API_SECRET: process.env.GETSTREAM_API_SECRET,
+        REDIS_PASSWORD: process.env.REDIS_PASSWORD,
+        REDIS_PORT: process.env.REDIS_PORT,
+        REDIS_HOST: process.env.REDIS_HOST,
+        EMAIL_USER: process.env.EMAIL_USER,
+        EMAIL_PASSWORD: process.env.EMAIL_PASSWORD
       },
     },
   ],
