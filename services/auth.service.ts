@@ -75,7 +75,7 @@ export default class AuthService {
 
       return {
         message: "OTP has been sent to your email",
-        email: email,
+        email: user.email,
       };
     } catch (error) {
       if (error instanceof Error) {
@@ -83,6 +83,48 @@ export default class AuthService {
       }
       throw error;
     }
+  }
+
+  static async quickLogin(
+    credentials: LoginPayload
+  ): Promise<PostAuthResponse> {
+    const parsed = loginValidation.safeParse(credentials);
+    if (!parsed.success) {
+      throw new Error(JSON.stringify(parsed.error.flatten().fieldErrors));
+    }
+
+    const { email, password } = parsed.data;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error("Invalid email/password");
+    }
+
+    const isValidatePassword = comparePassword(password, user.password);
+    if (!isValidatePassword) {
+      throw new Error("Invalid email/password");
+    }
+
+    const access_token = signToken({ id: user._id });
+    const chatToken = chatClient.createToken(user._id.toString());
+
+    // Upsert user in GetStream
+    await chatClient.upsertUser({
+      id: user._id.toString(),
+      name: user.fullName,
+    });
+
+    return {
+      access_token,
+      token_type: "Bearer",
+      chat_token: chatToken,
+      user: {
+        id: user._id.toString(),
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+      },
+    };
   }
 
   // Verify OTP for registration

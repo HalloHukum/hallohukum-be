@@ -14,24 +14,37 @@ export interface AuthenticatedRequest extends Request {
  *     RegisterRequest:
  *       type: object
  *       required:
+ *         - email
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: User's email address
+ *     RegisterVerifyRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - otp
  *         - fullName
  *         - phone
- *         - email
  *         - password
  *         - dateOfBirth
  *         - city
  *         - gender
  *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: User's email address
+ *         otp:
+ *           type: string
+ *           description: One-time password received via email
  *         fullName:
  *           type: string
  *           description: User's full name
  *         phone:
  *           type: string
  *           description: User's phone number
- *         email:
- *           type: string
- *           format: email
- *           description: User's email address
  *         password:
  *           type: string
  *           format: password
@@ -65,7 +78,16 @@ export interface AuthenticatedRequest extends Request {
  *           type: string
  *           format: password
  *           description: User's password
- *     LoginResponse:
+ *     PreAuthResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           description: Response message
+ *         email:
+ *           type: string
+ *           description: User's email address
+ *     PostAuthResponse:
  *       type: object
  *       properties:
  *         access_token:
@@ -94,18 +116,19 @@ export interface AuthenticatedRequest extends Request {
  *               type: string
  *               enum: [client, lawyer, admin]
  *               description: User's role
- *     AuthResponse:
+ *     VerifyOTPRequest:
  *       type: object
+ *       required:
+ *         - email
+ *         - otp
  *       properties:
- *         fullName:
- *           type: string
- *           description: User's full name (for register response)
  *         email:
  *           type: string
- *           description: User's email (for register response)
- *         role:
+ *           format: email
+ *           description: User's email address
+ *         otp:
  *           type: string
- *           description: User's role (for register response)
+ *           description: One-time password received via email
  *     UpdateMeRequest:
  *       type: object
  *       properties:
@@ -130,19 +153,6 @@ export interface AuthenticatedRequest extends Request {
  *           type: string
  *           enum: [male, female]
  *           description: User's gender
- *     VerifyOTPRequest:
- *       type: object
- *       required:
- *         - email
- *         - otp
- *       properties:
- *         email:
- *           type: string
- *           format: email
- *           description: User's email address
- *         otp:
- *           type: string
- *           description: One-time password received via SMS
  */
 
 export default class AuthController {
@@ -150,7 +160,7 @@ export default class AuthController {
    * @swagger
    * /register:
    *   post:
-   *     summary: Register a new user
+   *     summary: Start registration process by sending OTP
    *     tags: [Auth]
    *     requestBody:
    *       required: true
@@ -159,8 +169,8 @@ export default class AuthController {
    *           schema:
    *             $ref: '#/components/schemas/RegisterRequest'
    *     responses:
-   *       201:
-   *         description: User registered successfully
+   *       200:
+   *         description: OTP sent successfully
    *         content:
    *           application/json:
    *             schema:
@@ -171,9 +181,9 @@ export default class AuthController {
    *                   example: success
    *                 message:
    *                   type: string
-   *                   example: User registered successfully
+   *                   example: OTP has been sent to your email
    *                 data:
-   *                   $ref: '#/components/schemas/AuthResponse'
+   *                   $ref: '#/components/schemas/PreAuthResponse'
    *       400:
    *         description: Invalid input data
    *         content:
@@ -187,6 +197,9 @@ export default class AuthController {
    *                 message:
    *                   type: string
    *                   example: Validation error
+   *                 data:
+   *                   type: object
+   *                   description: Validation errors
    *       500:
    *         description: Server error
    */
@@ -225,7 +238,7 @@ export default class AuthController {
    * @swagger
    * /login:
    *   post:
-   *     summary: Login user
+   *     summary: Start login process by sending OTP
    *     tags: [Auth]
    *     requestBody:
    *       required: true
@@ -235,7 +248,7 @@ export default class AuthController {
    *             $ref: '#/components/schemas/LoginRequest'
    *     responses:
    *       200:
-   *         description: Login successful
+   *         description: OTP sent successfully
    *         content:
    *           application/json:
    *             schema:
@@ -246,9 +259,9 @@ export default class AuthController {
    *                   example: success
    *                 message:
    *                   type: string
-   *                   example: Login successful
+   *                   example: OTP has been sent to your email
    *                 data:
-   *                   $ref: '#/components/schemas/LoginResponse'
+   *                   $ref: '#/components/schemas/PreAuthResponse'
    *       401:
    *         description: Invalid credentials
    *         content:
@@ -275,6 +288,9 @@ export default class AuthController {
    *                 message:
    *                   type: string
    *                   example: Validation error
+   *                 data:
+   *                   type: object
+   *                   description: Validation errors
    *       500:
    *         description: Server error
    */
@@ -312,6 +328,99 @@ export default class AuthController {
         status: "error",
         message: "Error during login",
       });
+    }
+  }
+
+  /**
+   * @swagger
+   * /quick-login:
+   *   post:
+   *     summary: Quick login without OTP verification
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/LoginRequest'
+   *     responses:
+   *       200:
+   *         description: Quick login successful
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                   example: success
+   *                 message:
+   *                   type: string
+   *                   example: Login successful
+   *                 data:
+   *                   $ref: '#/components/schemas/PostAuthResponse'
+   *       401:
+   *         description: Invalid credentials
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                   example: error
+   *                 message:
+   *                   type: string
+   *                   example: Invalid email/password
+   *       400:
+   *         description: Invalid input data
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                   example: error
+   *                 message:
+   *                   type: string
+   *                   example: Validation error
+   *                 data:
+   *                   type: object
+   *                   description: Validation errors
+   *       500:
+   *         description: Server error
+   */
+  static async quickLogin(req: Request, res: Response) {
+    try {
+      const result = await AuthService.quickLogin(req.body);
+      res.status(200).json({
+        status: "success",
+        message: "Login successful",
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "Invalid email/password") {
+          return res.status(401).json({
+            status: "error",
+            message: error.message,
+          });
+        }
+        try {
+          const errorData = JSON.parse(error.message);
+          return res.status(400).json({
+            status: "error",
+            message: "Validation error",
+            data: errorData,
+          });
+        } catch {
+          return res.status(500).json({
+            status: "error",
+            message: "Error during quick login",
+          });
+        }
+      }
     }
   }
 

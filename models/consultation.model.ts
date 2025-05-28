@@ -7,14 +7,17 @@ const consultationSchema: Schema<IConsultation> = new Schema(
     userId: {
       type: Schema.Types.ObjectId,
       required: true,
+      ref: "User",
     },
     lawyerId: {
       type: Schema.Types.ObjectId,
       required: true,
+      ref: "Lawyer",
     },
     categoryId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
+      ref: "Category",
     },
     problemDescription: {
       type: String,

@@ -20,11 +20,82 @@ import ReviewService from "../services/review.service";
  *           type: string
  *           description: The auto-generated id of the review
  *         userId:
- *           type: string
- *           description: Reference to the user who created the review
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               description: The user's ID
+ *             fullName:
+ *               type: string
+ *               description: Full name of the user
+ *             email:
+ *               type: string
+ *               description: Email address of the user
+ *             role:
+ *               type: string
+ *               description: Role of the user (user/lawyer)
+ *           description: User data of the reviewer
  *         lawyerId:
- *           type: string
- *           description: Reference to the lawyer being reviewed
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               description: The lawyer's ID
+ *             userId:
+ *               type: string
+ *               description: The lawyer's user ID
+ *             specialization:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               description: Areas of legal expertise
+ *             yearsOfExperience:
+ *               type: number
+ *               description: Number of years of legal experience
+ *             certifications:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               description: Professional certifications
+ *             qualification:
+ *               type: string
+ *               description: Professional qualifications
+ *             about:
+ *               type: string
+ *               description: Brief description about the lawyer
+ *             image:
+ *               type: string
+ *               description: Profile image URL
+ *             isVerified:
+ *               type: boolean
+ *               description: Whether the lawyer is verified
+ *             status:
+ *               type: string
+ *               enum: [online, offline]
+ *               description: Current availability status
+ *             price:
+ *               type: number
+ *               description: Consultation price
+ *             totalConsults:
+ *               type: number
+ *               description: Total number of consultations completed
+ *             user:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: The lawyer's user ID
+ *                 fullName:
+ *                   type: string
+ *                   description: Full name of the lawyer
+ *                 email:
+ *                   type: string
+ *                   description: Email address of the lawyer
+ *                 role:
+ *                   type: string
+ *                   description: Role of the lawyer (lawyer)
+ *               description: User data of the lawyer
+ *           description: Full lawyer data including user information
  *         rating:
  *           type: number
  *           minimum: 1
@@ -349,7 +420,7 @@ export default class ReviewController {
       }
 
       // Check if the user is the owner of the review
-      if (review.userId !== req.user._id.toString()) {
+      if (review.userId.toString() !== req.user._id.toString()) {
         return res.status(403).json({
           status: "error",
           message: "Forbidden - You can only delete your own reviews",
