@@ -30,15 +30,39 @@ export default class ConsultationService {
     if (filters.status) filter.status = filters.status;
 
     return await Consultation.find(filter)
-      .populate("userId", "fullName")
-      .populate("lawyerId", "fullName")
+      .populate({
+        path: "userId",
+        select: "_id fullName email role",
+      })
+      .populate({
+        path: "lawyerId",
+        select:
+          "_id specialization yearsOfExperience certifications qualification about image isVerified status price totalConsults",
+        populate: {
+          path: "userId",
+          select: "_id fullName email role",
+        },
+      })
+      .populate("categoryId", "_id title")
       .sort({ createdAt: -1 });
   }
 
   static async getConsultationById(id: string): Promise<IConsultation | null> {
     return await Consultation.findById(id)
-      .populate("userId", "fullName")
-      .populate("lawyerId", "fullName");
+      .populate({
+        path: "userId",
+        select: "_id fullName email role",
+      })
+      .populate({
+        path: "lawyerId",
+        select:
+          "_id specialization yearsOfExperience certifications qualification about image isVerified status price totalConsults",
+        populate: {
+          path: "userId",
+          select: "_id fullName email role",
+        },
+      })
+      .populate("categoryId", "_id title");
   }
 
   static async updateConsultation(
@@ -46,8 +70,20 @@ export default class ConsultationService {
     updateData: Partial<IConsultation>
   ): Promise<IConsultation | null> {
     return await Consultation.findByIdAndUpdate(id, updateData, { new: true })
-      .populate("userId", "fullName")
-      .populate("lawyerId", "fullName");
+      .populate({
+        path: "userId",
+        select: "_id fullName email role",
+      })
+      .populate({
+        path: "lawyerId",
+        select:
+          "_id specialization yearsOfExperience certifications qualification about image isVerified status price totalConsults",
+        populate: {
+          path: "userId",
+          select: "_id fullName email role",
+        },
+      })
+      .populate("categoryId", "_id title");
   }
 
   static async deleteConsultation(id: string): Promise<IConsultation | null> {
@@ -72,7 +108,19 @@ export default class ConsultationService {
     chatId: string
   ): Promise<IConsultation | null> {
     return await Consultation.findOne({ chatId })
-      .populate("userId", "fullName")
-      .populate("lawyerId", "fullName");
+      .populate({
+        path: "userId",
+        select: "_id fullName email role",
+      })
+      .populate({
+        path: "lawyerId",
+        select:
+          "_id specialization yearsOfExperience certifications qualification about image isVerified status price totalConsults",
+        populate: {
+          path: "userId",
+          select: "_id fullName email role",
+        },
+      })
+      .populate("categoryId", "_id title");
   }
 }
