@@ -9,5 +9,6 @@ router.use(authentication);
 
 // Create a new call
 router.post("/video", CallController.createCall);
+router.post("/voice", CallController.createCall);
 
 export default router;

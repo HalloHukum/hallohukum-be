@@ -31,13 +31,91 @@ export interface AuthenticatedRequest extends Request {
  *           type: string
  *           description: The auto-generated id of the consultation
  *         userId:
- *           type: string
- *           description: Reference to the user who created the consultation
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               description: The user's ID
+ *             fullName:
+ *               type: string
+ *               description: Full name of the user
+ *             email:
+ *               type: string
+ *               description: Email address of the user
+ *             role:
+ *               type: string
+ *               description: Role of the user (user/lawyer)
+ *           description: User data of the consultation creator
  *         lawyerId:
- *           type: string
- *           description: Reference to the lawyer assigned to the consultation
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               description: The lawyer's ID
+ *             userId:
+ *               type: string
+ *               description: The lawyer's user ID
+ *             specialization:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               description: Areas of legal expertise
+ *             yearsOfExperience:
+ *               type: number
+ *               description: Number of years of legal experience
+ *             certifications:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               description: Professional certifications
+ *             qualification:
+ *               type: string
+ *               description: Professional qualifications
+ *             about:
+ *               type: string
+ *               description: Brief description about the lawyer
+ *             image:
+ *               type: string
+ *               description: Profile image URL
+ *             isVerified:
+ *               type: boolean
+ *               description: Whether the lawyer is verified
+ *             status:
+ *               type: string
+ *               enum: [online, offline]
+ *               description: Current availability status
+ *             price:
+ *               type: number
+ *               description: Consultation price
+ *             totalConsults:
+ *               type: number
+ *               description: Total number of consultations completed
+ *             userId:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: The lawyer's user ID
+ *                 fullName:
+ *                   type: string
+ *                   description: Full name of the lawyer
+ *                 email:
+ *                   type: string
+ *                   description: Email address of the lawyer
+ *                 role:
+ *                   type: string
+ *                   description: Role of the lawyer (lawyer)
+ *               description: User data of the lawyer
+ *           description: Full lawyer data including user information
  *         categoryId:
- *           type: string
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               description: The category's ID
+ *             title:
+ *               type: string
+ *               description: Title of the legal category
  *           description: The category of the legal consultation
  *         caseType:
  *           type: string
@@ -45,6 +123,10 @@ export interface AuthenticatedRequest extends Request {
  *         problemDescription:
  *           type: string
  *           description: Detailed description of the legal problem
+ *         method:
+ *           type: string
+ *           enum: [chat, call, video]
+ *           description: Consultation method
  *         legalBasis:
  *           type: string
  *           description: Legal basis for the consultation
@@ -60,6 +142,10 @@ export interface AuthenticatedRequest extends Request {
  *         disclaimer:
  *           type: string
  *           description: Legal disclaimer
+ *         durationMinutes:
+ *           type: number
+ *           minimum: 0
+ *           description: Duration of the consultation in minutes
  *         expiredAt:
  *           type: string
  *           format: date-time
@@ -427,7 +513,7 @@ export default class ConsultationController {
 
       // Check if user has access to this consultation
       const isOwner = await ConsultationService.isConsultationOwner(
-        req.params.id,
+        consultation.id.toString(),
         req.user._id.toString(),
         req.user.role === "lawyer"
       );
@@ -443,6 +529,7 @@ export default class ConsultationController {
         status: "success",
         message: "Consultation retrieved successfully",
         data: {
+          consultationId: consultation._id,
           chatId: consultation.chatId,
           expiredAt: consultation.expiredAt,
         },

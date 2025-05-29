@@ -3,7 +3,7 @@ import { Document, Types } from "mongoose";
 export interface IConsultation extends Document {
   userId: Types.ObjectId;
   lawyerId: Types.ObjectId;
-  categoryId: string;
+  categoryId: Types.ObjectId;
   caseType: string;
   problemDescription: string;
   method: "chat" | "call" | "video";

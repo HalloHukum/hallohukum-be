@@ -5,14 +5,14 @@ import { IReview } from "../interfaces/review.interface";
 const reviewSchema: Schema<IReview> = new Schema(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
     lawyerId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
-      ref: "User",
+      ref: "Lawyer",
     },
     rating: {
       type: Number,

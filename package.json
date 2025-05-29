@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/HaloHukum/backend#readme",
   "dependencies": {
+    "@stream-io/node-sdk": "^0.4.24",
     "@types/cors": "^2.8.18",
     "@types/ioredis": "^5.0.0",
     "@types/nodemailer": "^6.4.17",
