@@ -1,15 +1,17 @@
 import Midtrans from "midtrans-client";
+import Transaction from "../models/transaction.model";
 
 interface PaymentRequest {
-  id: string;
-  userId: string;
-  consultationId: string;
+  method: string;
+  lawyerId: string;
   amount: number;
+  userId: string;
 }
 
 interface TransactionResponse {
   token: string;
   redirect_url: string;
+  order_id: string;
 }
 
 export class TransactionService {
@@ -21,28 +23,39 @@ export class TransactionService {
   static async createTransaction(
     payload: PaymentRequest
   ): Promise<TransactionResponse> {
-    const { id, consultationId, amount } = payload;
+    const { method, lawyerId, amount, userId } = payload;
+    const order_id = `${method}-${Date.now()}-${lawyerId}`;
 
     const parameter = {
       transaction_details: {
-        order_id: id,
+        order_id,
         gross_amount: amount,
       },
       item_details: [
         {
-          id: consultationId,
-          name: `Consultation ${consultationId}`,
+          order_id,
+          name: `Consultation ${method}-${lawyerId}`,
           price: amount,
-          // quantity: 1
+          quantity: 1,
         },
       ],
     };
 
     try {
-      const token = await this.snap.createTransactionToken(parameter);
+      // Create a transaction in the database
+      await Transaction.create({
+        userId,
+        orderId: order_id,
+        amount,
+        status: "pending",
+        payment_type: null,
+      });
+
+      const transaction = await this.snap.createTransaction(parameter);
       return {
-        token,
-        redirect_url: "https://app.sandbox.midtrans.com/snap/snap.js",
+        token: transaction.token,
+        redirect_url: transaction.redirect_url,
+        order_id,
       };
     } catch (error: any) {
       console.error("failed to create token: ", error.message);
