@@ -143,15 +143,15 @@ export default class CallController {
    *       500:
    *         description: Server error
    */
-  static async createVoice(req: Request, res: Response) {
+  static async createVoiceCall(req: Request, res: Response) {
     try {
       const { clientId, lawyerId } = req.body;
 
-      const result = await CallService.createVoice(clientId, lawyerId);
+      const result = await CallService.createCall(clientId, lawyerId, true); // video = false
 
       res.status(201).json({
         status: "success",
-        message: "Voice created successfully",
+        message: "Voice call created successfully",
         data: result,
       });
     } catch (error) {
