@@ -3,8 +3,8 @@ import { NextFunction, Response } from "express";
 import Midtrans from "midtrans-client";
 
 import { AuthenticatedRequest } from "../interfaces/auth.interface";
-import { TransactionService } from "../services/transaction.service";
 import Transaction from "../models/transaction.model";
+import { TransactionService } from "../services/transaction.service";
 
 export default class TransactionController {
   static async createTransaction(
