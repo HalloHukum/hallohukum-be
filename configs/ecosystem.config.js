@@ -15,7 +15,9 @@ module.exports = {
         REDIS_PORT: "11668",
         REDIS_HOST: "redis-11668.crce194.ap-seast-1-1.ec2.redns.redis-cloud.com",
         EMAIL_USER: "hallohukumprojects@gmail.com",
-        EMAIL_PASSWORD: "lbzxwimrglssmjcs"
+        EMAIL_PASSWORD: "lbzxwimrglssmjcs",
+        MIDTRANS_PUBLIC_CLIENT: "SB-Mid-client-5fsvdcayjEWIrsJJ",
+        MIDTRANS_SECRET: "SB-Mid-server-QFCZHwircNYgm-ugMzl0LkVL"
       },
     },
   ],
