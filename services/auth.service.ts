@@ -22,6 +22,7 @@ export default class AuthService {
   // Register flow
   static async register(userData: RegisterPayload): Promise<PreAuthResponse> {
     const parsed = registerValidation.safeParse(userData);
+    const phone = userData.phone;
     if (!parsed.success) {
       throw new Error(JSON.stringify(parsed.error.flatten().fieldErrors));
     }
@@ -36,11 +37,11 @@ export default class AuthService {
 
     try {
       // Generate and send OTP
-      await otpService.sendOTP(email);
+      await otpService.sendOTP(phone);
 
       return {
         message: "OTP has been sent to your email",
-        email: email,
+        phone: phone,
       };
     } catch (error) {
       if (error instanceof Error) {
@@ -71,11 +72,12 @@ export default class AuthService {
 
     try {
       // Generate and send OTP
-      await otpService.sendOTP(email);
+      const phone = user.phone;
+      await otpService.sendOTP(phone);
 
       return {
-        message: "OTP has been sent to your email",
-        email: user.email,
+        message: "OTP has been sent to your whatsapp",
+        phone: user.phone,
       };
     } catch (error) {
       if (error instanceof Error) {
@@ -129,29 +131,30 @@ export default class AuthService {
 
   // Verify OTP for registration
   static async verifyRegisterOTP(
-    email: string,
+    phone: string,
     otp: string,
     userData: RegisterPayload
   ): Promise<PostAuthResponse> {
-    if (!email || !otp) {
+    
+    if (!phone || !otp) {
       throw new Error(
         JSON.stringify({
-          otp: ["Email and OTP are required"],
+          otp: ["Phone Number and OTP are required"],
         })
       );
     }
 
-    const isValidOTP = await otpService.verifyOTP(email, otp);
+    const isValidOTP = await otpService.verifyOTP(phone, otp);
     if (!isValidOTP) {
       throw new Error("Invalid or expired OTP");
     }
 
-    const parsed = registerValidation.safeParse({ ...userData, email });
+    const parsed = registerValidation.safeParse({ ...userData, phone });
     if (!parsed.success) {
       throw new Error(JSON.stringify(parsed.error.flatten().fieldErrors));
     }
 
-    const { fullName, phone, password, dateOfBirth, city, gender, role } =
+    const { fullName, email, password, dateOfBirth, city, gender, role } =
       parsed.data;
 
     // Create new user
@@ -189,23 +192,23 @@ export default class AuthService {
 
   // Verify OTP for login
   static async verifyLoginOTP(
-    email: string,
+    phone: string,
     otp: string
   ): Promise<PostAuthResponse> {
-    if (!email || !otp) {
+    if (!phone || !otp) {
       throw new Error(
         JSON.stringify({
-          otp: ["Email and OTP are required"],
+          otp: ["Phone Number and OTP are required"],
         })
       );
     }
 
-    const isValidOTP = await otpService.verifyOTP(email, otp);
+    const isValidOTP = await otpService.verifyOTP(phone, otp);
     if (!isValidOTP) {
       throw new Error("Invalid or expired OTP");
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ phone });
     if (!user) {
       throw new Error("User not found");
     }
