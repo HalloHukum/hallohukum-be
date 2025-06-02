@@ -31,7 +31,7 @@ export interface LoginPayload {
 }
 
 export interface PreAuthResponse {
-  email?: string;
+  phone?: string;
   message?: string;
 }
 
