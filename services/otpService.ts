@@ -1,11 +1,12 @@
 import { randomInt } from "crypto";
 
 import redis from "../configs/redis.config";
-import { emailService } from "./emailService";
+// import { emailService } from "./emailService";
+import FazpassService from "./fazpassService";
 
 //interface OTPData
 interface OTPData {
-  email: string;
+  phone: string;
   otp: string;
   expiresAt: Date;
 }
@@ -18,26 +19,28 @@ class OTPService {
     return randomInt(100000, 999999).toString();
   }
 
-  async sendOTP(email: string): Promise<string> {
+  async sendOTP(phone: string): Promise<string> {
     const otp = this.generateOTP();
     const otpData: OTPData = {
-      email,
+      phone,
       otp,
       expiresAt: new Date(Date.now() + this.OTP_EXPIRY * 1000),
     };
 
     // Store OTP in Redis
-    const key = `${this.OTP_PREFIX}${email}`;
+    const key = `${this.OTP_PREFIX}${phone}`;
     await redis.setex(key, this.OTP_EXPIRY, JSON.stringify(otpData));
 
     // Send OTP via email
-    await emailService.sendOTPEmail(email, otp);
+    // await emailService.sendOTPEmail(email, otp);
 
+    // Send OTP via Whatsapp
+    await FazpassService.sendOtp(phone, otp);
     return otp;
   }
 
-  async getOTP(email: string): Promise<OTPData | null> {
-    const key = `${this.OTP_PREFIX}${email}`;
+  async getOTP(phone: string): Promise<OTPData | null> {
+    const key = `${this.OTP_PREFIX}${phone}`;
     const data = await redis.get(key);
 
     if (!data) {
@@ -47,15 +50,18 @@ class OTPService {
     return JSON.parse(data) as OTPData;
   }
 
-  async verifyOTP(email: string, otp: string): Promise<boolean> {
-    const otpData = await this.getOTP(email);
+  async verifyOTP(phone: string, otp: string): Promise<boolean> {
+    const storedOtp= await this.getOTP(phone);
+    console.log("Checking OTP for", phone);
+    console.log("Expected:", storedOtp, "Received:", otp);
+    const otpData = await this.getOTP(phone);
 
     if (!otpData) {
       return false;
     }
 
     if (otpData.expiresAt < new Date()) {
-      await this.deleteOTP(email);
+      await this.deleteOTP(phone);
       return false;
     }
 
@@ -63,12 +69,12 @@ class OTPService {
       return false;
     }
 
-    await this.deleteOTP(email);
+    await this.deleteOTP(phone);
     return true;
   }
 
-  private async deleteOTP(email: string): Promise<void> {
-    const key = `${this.OTP_PREFIX}${email}`;
+  private async deleteOTP(phone: string): Promise<void> {
+    const key = `${this.OTP_PREFIX}${phone}`;
     await redis.del(key);
   }
 }
