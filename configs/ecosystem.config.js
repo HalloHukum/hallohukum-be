@@ -17,7 +17,9 @@ module.exports = {
         EMAIL_USER: "hallohukumprojects@gmail.com",
         EMAIL_PASSWORD: "lbzxwimrglssmjcs",
         MIDTRANS_PUBLIC_CLIENT: "SB-Mid-client-5fsvdcayjEWIrsJJ",
-        MIDTRANS_SECRET: "SB-Mid-server-QFCZHwircNYgm-ugMzl0LkVL"
+        MIDTRANS_SECRET: "SB-Mid-server-QFCZHwircNYgm-ugMzl0LkVL",
+        FAZPASS_GATEWAY_KEY: "47475090-036c-4812-86e4-940e3b3ebcb6",
+        FAZPASS_MERCHANT_ID: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoxMzk4OH0.Ac_L9Ha3PbGArFijNpw5IQfKwshxMixuuSf9ZSl64UM"
       },
     },
   ],
