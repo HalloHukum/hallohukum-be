@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import Lawyer from "../models/lawyer.model";
+import LawyerService from "../services/lawyer.service";
 
 /**
  * @swagger
@@ -411,6 +412,68 @@ export default class LawyerController {
         status: "error",
         message:
           error instanceof Error ? error.message : "Error updating lawyer",
+      });
+    }
+  }
+
+  /**
+   * @swagger
+   * /lawyers/{id}/status:
+   *   patch:
+   *     summary: Toggle lawyer's status between online and offline
+   *     tags: [Lawyers]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Lawyer ID
+   *     responses:
+   *       200:
+   *         description: Lawyer status toggled successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                   example: success
+   *                 message:
+   *                   type: string
+   *                   example: Lawyer status toggled successfully
+   *                 data:
+   *                   $ref: '#/components/schemas/LawyerResponse'
+   *       404:
+   *         description: Lawyer not found
+   *       500:
+   *         description: Server error
+   */
+  static async updateLawyerStatus(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const lawyer = await LawyerService.toggleLawyerStatus(id);
+
+      if (!lawyer) {
+        return res.status(404).json({
+          status: "error",
+          message: "Lawyer not found",
+        });
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: "Lawyer status toggled successfully",
+        data: lawyer,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Error toggling lawyer status",
       });
     }
   }
