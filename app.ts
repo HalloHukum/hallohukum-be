@@ -1,10 +1,10 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import swaggerUi from "swagger-ui-express";
 
+// import swaggerUi from "swagger-ui-express";
 import { connectDB } from "./configs/mongoose.config";
-import { swaggerSpec } from "./configs/swagger.config";
+// import { swaggerSpec } from "./configs/swagger.config";
 import { errorHandler } from "./middlewares/error.middleware";
 import routes from "./routes";
 
@@ -20,15 +20,15 @@ app.use(express.json());
 app.use(cors());
 
 // API Documentation
-app.use(
-  "/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    customCss: `
-      .swagger-ui .topbar { display: none }
-    `,
-  })
-);
+// app.use(
+//   "/docs",
+//   [swaggerUi.serve],
+//   swaggerUi.setup(swaggerSpec, {
+//     customCss: `
+//       .swagger-ui .topbar { display: none }
+//     `,
+//   })
+// );
 
 // Basic route
 app.get("/", (req, res) => {
