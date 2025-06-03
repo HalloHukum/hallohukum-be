@@ -52,9 +52,6 @@ export interface AuthenticatedRequest extends Request {
  *             _id:
  *               type: string
  *               description: The lawyer's ID
- *             userId:
- *               type: string
- *               description: The lawyer's user ID
  *             specialization:
  *               type: array
  *               items:

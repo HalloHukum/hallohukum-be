@@ -18,8 +18,8 @@ module.exports = {
         EMAIL_PASSWORD: "lbzxwimrglssmjcs",
         MIDTRANS_PUBLIC_CLIENT: "SB-Mid-client-5fsvdcayjEWIrsJJ",
         MIDTRANS_SECRET: "SB-Mid-server-QFCZHwircNYgm-ugMzl0LkVL",
-        FAZPASS_GATEWAY_KEY: "47475090-036c-4812-86e4-940e3b3ebcb6",
-        FAZPASS_MERCHANT_ID: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoxMzk4OH0.Ac_L9Ha3PbGArFijNpw5IQfKwshxMixuuSf9ZSl64UM"
+        FAZPASS_GATEWAY_KEY: "2d7696c6-d022-4f3d-8cfd-050c4a6adde1",
+        FAZPASS_MERCHANT_ID: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoxNDE1N30.bj_NbSXYIykpEISo1LOXvHqyFzWvw-rA26V6W4aLKnU"
       },
     },
   ],
