@@ -1,4 +1,5 @@
 import { serverClient } from "../configs/getstream.config";
+import { v4 as uuidv4 } from "uuid";
 
 export default class CallService {
   static async createCall(
@@ -15,10 +16,7 @@ export default class CallService {
       { id: lawyerId, role: "user" },
     ]);
 
-    const callId = `call_${clientId.slice(0, 8)}_${lawyerId.slice(
-      0,
-      8
-    )}_${Date.now()}`;
+    const callId = `call_${uuidv4()}`;
     const callType = audioOnly ? "audio_room" : "default";
     const call = serverClient.video.call(callType, callId);
 

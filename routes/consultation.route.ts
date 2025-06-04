@@ -13,5 +13,6 @@ router.get("/channels/:id", ConsultationController.getConsultationByChatId);
 router.get("/:id", ConsultationController.getConsultation);
 router.put("/:id", ConsultationController.updateConsultation);
 router.delete("/:id", ConsultationController.deleteConsultation);
+router.patch("/:id/end", ConsultationController.endConsultation);
 
 export default router;
