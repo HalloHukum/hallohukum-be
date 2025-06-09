@@ -52,9 +52,6 @@ export interface AuthenticatedRequest extends Request {
  *             _id:
  *               type: string
  *               description: The lawyer's ID
- *             userId:
- *               type: string
- *               description: The lawyer's user ID
  *             specialization:
  *               type: array
  *               items:
@@ -708,6 +705,69 @@ export default class ConsultationController {
       res.status(200).json({
         status: "success",
         message: "Consultation deleted successfully",
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+  }
+
+  // /consultations/{id}/end swagger doc
+
+  // endConsultation function
+  /**
+   * @swagger
+   * /consultations/{id}/end:
+   *   patch:
+   *     summary: End a consultation by marking it as expired
+   *     tags: [Consultations]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Consultation ID
+   *     responses:
+   *       200:
+   *         description: Consultation ended successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ConsultationResponse'
+   *       403:
+   *         description: Forbidden
+   *       404:
+   *         description: Consultation not found
+   */
+  static async endConsultation(req: AuthenticatedRequest, res: Response) {
+    try {
+      if (!req.user?._id) {
+        return res.status(401).json({
+          status: "error",
+          message: "Unauthorized - User not authenticated",
+        });
+      }
+
+      const consultation = await ConsultationService.endConsultation(
+        req.params.id
+      );
+
+      if (!consultation) {
+        return res.status(404).json({
+          status: "error",
+          message: "Consultation not found",
+        });
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: "Consultation ended successfully",
+        data: consultation,
       });
     } catch (error: any) {
       res.status(500).json({

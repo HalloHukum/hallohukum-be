@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 
+import { chatClient } from "../configs/getstream.config";
 import { IConsultation } from "../interfaces/consultation.interface";
 import Consultation from "../models/consultation.model";
 
@@ -122,5 +123,41 @@ export default class ConsultationService {
         },
       })
       .populate("categoryId", "_id title");
+  }
+
+  static async endConsultation(id: string): Promise<IConsultation | null> {
+    const consultation = await Consultation.findByIdAndUpdate(
+      id,
+      {
+        status: "expired",
+        expiredAt: null,
+      },
+      { new: true }
+    )
+      .populate({
+        path: "userId",
+        select: "_id fullName email role",
+      })
+      .populate({
+        path: "lawyerId",
+        select:
+          "_id specialization yearsOfExperience certifications qualification about image isVerified status price totalConsults",
+        populate: {
+          path: "userId",
+          select: "_id fullName email role",
+        },
+      })
+      .populate("categoryId", "_id title");
+
+    if (consultation?.chatId) {
+      try {
+        const channel = chatClient.channel("messaging", consultation.chatId);
+        await channel.update({ disabled: true });
+      } catch (error) {
+        console.error("Error deactivating GetStream channel:", error);
+      }
+    }
+
+    return consultation;
   }
 }

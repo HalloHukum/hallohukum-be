@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import { chatClient } from "../configs/getstream.config";
 
 export default class ChatService {
@@ -19,7 +21,7 @@ export default class ChatService {
     ]);
 
     // Create a unique call ID
-    const channelId = `chat_${clientId}_${lawyerId}`
+    const channelId = `chat_${uuidv4()}`;
 
     const newChannel = chatClient.channel("messaging", channelId, {
       name: `Consultation: ${clientId} & ${lawyerId}`,
