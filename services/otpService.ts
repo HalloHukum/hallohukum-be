@@ -51,9 +51,9 @@ class OTPService {
   }
 
   async verifyOTP(phone: string, otp: string): Promise<boolean> {
-    const storedOtp= await this.getOTP(phone);
-    console.log("Checking OTP for", phone);
-    console.log("Expected:", storedOtp, "Received:", otp);
+    // const storedOtp= await this.getOTP(phone);
+    // console.log("Checking OTP for", phone);
+    // console.log("Expected:", storedOtp, "Received:", otp);
     const otpData = await this.getOTP(phone);
 
     if (!otpData) {

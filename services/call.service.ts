@@ -1,5 +1,6 @@
-import { serverClient } from "../configs/getstream.config";
 import { v4 as uuidv4 } from "uuid";
+
+import { serverClient } from "../configs/getstream.config";
 
 export default class CallService {
   static async createCall(

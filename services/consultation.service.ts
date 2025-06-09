@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 
+import { chatClient } from "../configs/getstream.config";
 import { IConsultation } from "../interfaces/consultation.interface";
 import Consultation from "../models/consultation.model";
-import { chatClient } from "../configs/getstream.config";
 
 export default class ConsultationService {
   static async createConsultation(

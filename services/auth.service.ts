@@ -40,7 +40,7 @@ export default class AuthService {
       await otpService.sendOTP(phone);
 
       return {
-        message: "OTP has been sent to your email",
+        message: "OTP has been sent to your phone",
         phone: phone,
       };
     } catch (error) {
@@ -88,9 +88,11 @@ export default class AuthService {
   }
 
   static async quickLogin(
-    credentials: LoginPayload
+    credentials: LoginPayload,
+    // pushToken?: string
   ): Promise<PostAuthResponse> {
     const parsed = loginValidation.safeParse(credentials);
+    const pushToken = credentials.pushToken;
     if (!parsed.success) {
       throw new Error(JSON.stringify(parsed.error.flatten().fieldErrors));
     }
@@ -105,6 +107,11 @@ export default class AuthService {
     const isValidatePassword = comparePassword(password, user.password);
     if (!isValidatePassword) {
       throw new Error("Invalid email/password");
+    }
+
+    if (pushToken) {
+       await User.updateOne({ _id: user._id }, { $set: { pushToken } });
+      // console.log('Update result:', result);
     }
 
     const access_token = signToken({ id: user._id });
@@ -135,7 +142,6 @@ export default class AuthService {
     otp: string,
     userData: RegisterPayload
   ): Promise<PostAuthResponse> {
-    
     if (!phone || !otp) {
       throw new Error(
         JSON.stringify({
@@ -146,6 +152,7 @@ export default class AuthService {
 
     const isValidOTP = await otpService.verifyOTP(phone, otp);
     if (!isValidOTP) {
+      console.warn(`[OTP] Invalid or expired for ${phone}`);
       throw new Error("Invalid or expired OTP");
     }
 
@@ -193,7 +200,8 @@ export default class AuthService {
   // Verify OTP for login
   static async verifyLoginOTP(
     phone: string,
-    otp: string
+    otp: string,
+    pushToken?: string
   ): Promise<PostAuthResponse> {
     if (!phone || !otp) {
       throw new Error(
@@ -211,6 +219,10 @@ export default class AuthService {
     const user = await User.findOne({ phone });
     if (!user) {
       throw new Error("User not found");
+    }
+
+    if (pushToken) {
+      await User.updateOne({ _id: user._id }, { $set: { pushToken } });
     }
 
     const access_token = signToken({ id: user._id });

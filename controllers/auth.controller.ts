@@ -755,8 +755,8 @@ export default class AuthController {
    */
   static async verifyLoginOTP(req: Request, res: Response) {
     try {
-      const { phone, otp } = req.body;
-      const result = await AuthService.verifyLoginOTP(phone, otp);
+      const { phone, otp , pushToken} = req.body;
+      const result = await AuthService.verifyLoginOTP(phone, otp, pushToken);
       return res.status(200).json({
         status: "success",
         message: "Login successfull",

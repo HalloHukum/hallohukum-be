@@ -1,5 +1,6 @@
-import { chatClient } from "../configs/getstream.config";
 import { v4 as uuidv4 } from "uuid";
+
+import { chatClient } from "../configs/getstream.config";
 
 export default class ChatService {
   // TODO: clientId and lawyerId should be existing users
