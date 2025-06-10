@@ -28,10 +28,11 @@ export interface RegisterPayload {
 export interface LoginPayload {
   email: string;
   password: string;
+  pushToken?: string;
 }
 
 export interface PreAuthResponse {
-  email?: string;
+  phone?: string;
   message?: string;
 }
 

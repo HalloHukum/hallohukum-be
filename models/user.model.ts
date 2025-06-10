@@ -43,6 +43,10 @@ const userSchema: Schema<IUser> = new Schema(
       required: true,
       default: "client",
     },
+    pushToken:{
+      type: String,
+      default: null,
+    }
   },
   { timestamps: true }
 );

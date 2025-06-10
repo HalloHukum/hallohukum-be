@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { IUser } from "../interfaces/user.interface";
 import AuthService from "../services/auth.service";
+// import { log } from "console";
 
 export interface AuthenticatedRequest extends Request {
   user?: IUser;
@@ -318,6 +319,7 @@ export default class AuthController {
             data: errorData,
           });
         } catch {
+          console.error("Error parsing error message:", error);
           return res.status(500).json({
             status: "error",
             message: "Error during login",
@@ -755,8 +757,8 @@ export default class AuthController {
    */
   static async verifyLoginOTP(req: Request, res: Response) {
     try {
-      const { email, otp } = req.body;
-      const result = await AuthService.verifyLoginOTP(email, otp);
+      const { phone, otp , pushToken} = req.body;
+      const result = await AuthService.verifyLoginOTP(phone, otp, pushToken);
       return res.status(200).json({
         status: "success",
         message: "Login successfull",
@@ -938,8 +940,8 @@ export default class AuthController {
    */
   static async verifyRegisterOTP(req: Request, res: Response) {
     try {
-      const { email, otp, ...userData } = req.body;
-      const result = await AuthService.verifyRegisterOTP(email, otp, userData);
+      const { phone, otp, ...userData } = req.body;
+      const result = await AuthService.verifyRegisterOTP(phone, otp, userData);
       return res.status(200).json({
         status: "success",
         message: "Registration completed successfully",

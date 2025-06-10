@@ -11,6 +11,7 @@ export interface IUser extends Document {
   city: string;
   gender: "male" | "female";
   role: "client" | "lawyer" | "admin";
+  pushToken?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
