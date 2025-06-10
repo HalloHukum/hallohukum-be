@@ -50,6 +50,7 @@ export class TransactionService {
         amount,
         status: "pending",
         payment_type: null,
+        lawyerId,
       });
 
       const transaction = await this.snap.createTransaction(parameter);
