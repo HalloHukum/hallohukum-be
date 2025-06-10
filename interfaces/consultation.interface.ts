@@ -4,6 +4,7 @@ export interface IConsultation extends Document {
   userId: Types.ObjectId;
   lawyerId: Types.ObjectId;
   categoryId: Types.ObjectId;
+  reviewId: Types.ObjectId | null;
   caseType: string;
   problemDescription: string;
   method: "chat" | "call" | "video";
@@ -15,6 +16,7 @@ export interface IConsultation extends Document {
   durationMinutes: number;
   expiredAt: string;
   status: "active" | "expired";
+  price: number;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -236,10 +236,7 @@ export default class LawyerController {
    */
   static async getLawyers(req: Request, res: Response) {
     try {
-      const lawyers = await Lawyer.find().populate({
-        path: "userId",
-        select: "fullName phone email dateOfBirth city gender",
-      });
+      const lawyers = await LawyerService.getAllLawyersWithRatings();
       res.status(200).json({
         status: "success",
         message: "Lawyers retrieved successfully",
