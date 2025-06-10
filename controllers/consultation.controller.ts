@@ -352,9 +352,10 @@ export default class ConsultationController {
         });
       }
 
-      const consultations = await ConsultationService.getConsultations(
-        req.query
-      );
+      const consultations = await ConsultationService.getConsultations({
+        ...req.query,
+        userId: req.user._id.toString(),
+      });
       res.status(200).json({
         status: "success",
         message: "Consultations retrieved successfully",

@@ -1,8 +1,9 @@
 import { Types } from "mongoose";
 
+import { chatClient } from "../configs/getstream.config";
 import { IConsultation } from "../interfaces/consultation.interface";
 import Consultation from "../models/consultation.model";
-import { chatClient } from "../configs/getstream.config";
+import Lawyer from "../models/lawyer.model";
 
 export default class ConsultationService {
   static async createConsultation(
@@ -45,6 +46,7 @@ export default class ConsultationService {
         },
       })
       .populate("categoryId", "_id title")
+      .populate("reviewId", "comment rating date")
       .sort({ createdAt: -1 });
   }
 
@@ -63,7 +65,8 @@ export default class ConsultationService {
           select: "_id fullName email role",
         },
       })
-      .populate("categoryId", "_id title");
+      .populate("categoryId", "_id title")
+      .populate("reviewId", "comment rating date");
   }
 
   static async updateConsultation(
@@ -84,7 +87,8 @@ export default class ConsultationService {
           select: "_id fullName email role",
         },
       })
-      .populate("categoryId", "_id title");
+      .populate("categoryId", "_id title")
+      .populate("reviewId", "comment rating date");
   }
 
   static async deleteConsultation(id: string): Promise<IConsultation | null> {
@@ -100,9 +104,14 @@ export default class ConsultationService {
     const consultation = await Consultation.findById(consultationId);
     if (!consultation) return false;
 
-    return isLawyer
-      ? consultation.lawyerId.toString() === userId
-      : consultation.userId.toString() === userId;
+    if (isLawyer) {
+      const lawyer = await Lawyer.findById(consultation.lawyerId);
+      if (!lawyer) return false;
+
+      return lawyer.userId.toString() === userId;
+    } else {
+      return consultation.userId.toString() === userId;
+    }
   }
 
   static async getConsultationByChatId(
@@ -122,7 +131,8 @@ export default class ConsultationService {
           select: "_id fullName email role",
         },
       })
-      .populate("categoryId", "_id title");
+      .populate("categoryId", "_id title")
+      .populate("reviewId", "comment rating date");
   }
 
   static async endConsultation(id: string): Promise<IConsultation | null> {
@@ -147,7 +157,8 @@ export default class ConsultationService {
           select: "_id fullName email role",
         },
       })
-      .populate("categoryId", "_id title");
+      .populate("categoryId", "_id title")
+      .populate("reviewId", "comment rating date");
 
     if (consultation?.chatId) {
       try {

@@ -1,10 +1,19 @@
 import { IReview } from "../interfaces/review.interface";
+import Consultation from "../models/consultation.model";
 import Review from "../models/review.model";
 
 export default class ReviewService {
   static async createReview(reviewData: Partial<IReview>): Promise<IReview> {
     const review = new Review(reviewData);
-    return await review.save();
+    const saved = await review.save();
+
+    await Consultation.findByIdAndUpdate(
+      review.consultationId,
+      { reviewId: review._id },
+      { new: true }
+    );
+
+    return saved;
   }
 
   static async getReviews(): Promise<IReview[]> {
@@ -21,6 +30,11 @@ export default class ReviewService {
           path: "userId",
           select: "_id fullName email role",
         },
+      })
+      .populate({
+        path: "consultationId",
+        select: "categoryId",
+        populate: { path: "categoryId", select: "title" },
       })
       .sort({ createdAt: -1 });
   }
@@ -39,7 +53,13 @@ export default class ReviewService {
           path: "userId",
           select: "_id fullName email role",
         },
+      })
+      .populate({
+        path: "consultationId",
+        select: "categoryId",
+        populate: { path: "categoryId", select: "title" },
       });
+      
   }
 
   static async getReviewsByLawyerId(lawyerId: string): Promise<IReview[]> {
@@ -56,6 +76,11 @@ export default class ReviewService {
           path: "userId",
           select: "_id fullName email role",
         },
+      })
+      .populate({
+        path: "consultationId",
+        select: "categoryId",
+        populate: { path: "categoryId", select: "title" },
       })
       .sort({ createdAt: -1 });
   }
