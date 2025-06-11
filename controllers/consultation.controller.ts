@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 
 import { IUser } from "../interfaces/user.interface";
-import ConsultationService from "../services/consultation.service";
-import Lawyer from "../models/lawyer.model";
-import PushNotificationService from "../services/notification.service";
 import Consultation from "../models/consultation.model";
+import Lawyer from "../models/lawyer.model";
 import User from "../models/user.model";
+import ConsultationService from "../services/consultation.service";
+import PushNotificationService from "../services/notification.service";
 
 export interface AuthenticatedRequest extends Request {
   user?: IUser;
