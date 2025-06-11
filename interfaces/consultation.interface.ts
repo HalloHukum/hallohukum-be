@@ -14,7 +14,15 @@ export interface IConsultation extends Document {
   disclaimer: string;
   durationMinutes: number;
   expiredAt: string;
-  status: "active" | "expired";
+  orderId?: string;
+  status:
+    | "pending"
+    | "accepted"
+    | "declined"
+    | "paid"
+    | "active"
+    | "expired"
+    | "done";
   createdAt: Date;
   updatedAt: Date;
 }

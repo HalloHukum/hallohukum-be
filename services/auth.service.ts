@@ -88,8 +88,7 @@ export default class AuthService {
   }
 
   static async quickLogin(
-    credentials: LoginPayload,
-    // pushToken?: string
+    credentials: LoginPayload
   ): Promise<PostAuthResponse> {
     const parsed = loginValidation.safeParse(credentials);
     const pushToken = credentials.pushToken;
@@ -110,8 +109,11 @@ export default class AuthService {
     }
 
     if (pushToken) {
-       await User.updateOne({ _id: user._id }, { $set: { pushToken } });
-      // console.log('Update result:', result);
+      // Add new token if it doesn't exist
+      await User.updateOne(
+        { _id: user._id },
+        { $addToSet: { pushTokens: pushToken } }
+      );
     }
 
     const access_token = signToken({ id: user._id });
@@ -222,7 +224,11 @@ export default class AuthService {
     }
 
     if (pushToken) {
-      await User.updateOne({ _id: user._id }, { $set: { pushToken } });
+      // Add new token if it doesn't exist
+      await User.updateOne(
+        { _id: user._id },
+        { $addToSet: { pushTokens: pushToken } }
+      );
     }
 
     const access_token = signToken({ id: user._id });
