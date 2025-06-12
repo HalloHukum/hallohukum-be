@@ -35,6 +35,32 @@ import LawyerService from "../services/lawyer.service";
  *           enum: [male, female]
  *           description: User's gender
  *
+ *     ReviewData:
+ *       type: object
+ *       properties:
+ *         rating:
+ *           type: number
+ *           minimum: 1
+ *           maximum: 5
+ *           description: Rating given by the user
+ *         comment:
+ *           type: string
+ *           description: Review comment
+ *         date:
+ *           type: string
+ *           format: date-time
+ *           description: Date when the review was made
+ *         user:
+ *           type: object
+ *           properties:
+ *             fullName:
+ *               type: string
+ *               description: Full name of the reviewer
+ *             email:
+ *               type: string
+ *               format: email
+ *               description: Email of the reviewer
+ *
  *     LawyerRequest:
  *       type: object
  *       required:
@@ -124,6 +150,17 @@ import LawyerService from "../services/lawyer.service";
  *         totalConsults:
  *           type: number
  *           description: Total number of consultations
+ *         averageRating:
+ *           type: number
+ *           description: Average rating from all reviews
+ *         totalReviews:
+ *           type: number
+ *           description: Total number of reviews
+ *         reviews:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/ReviewData'
+ *           description: List of reviews for the lawyer
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -298,10 +335,7 @@ export default class LawyerController {
    */
   static async getLawyer(req: Request, res: Response) {
     try {
-      const lawyer = await Lawyer.findById(req.params.id).populate({
-        path: "userId",
-        select: "fullName phone email dateOfBirth city gender",
-      });
+      const lawyer = await LawyerService.getLawyerWithRatings(req.params.id);
 
       if (!lawyer) {
         return res.status(404).json({
