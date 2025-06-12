@@ -17,6 +17,11 @@ const transactionSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  lawyerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "Lawyer",
+  },
   createdAt: { type: Date, default: Date.now },
 });
 

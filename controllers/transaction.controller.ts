@@ -3,7 +3,10 @@ import { NextFunction, Response } from "express";
 import Midtrans from "midtrans-client";
 
 import { AuthenticatedRequest } from "../interfaces/auth.interface";
+// import Lawyer from "../models/lawyer.model";
 import Transaction from "../models/transaction.model";
+import User from "../models/user.model";
+import PushNotificationService from "../services/notification.service";
 import { TransactionService } from "../services/transaction.service";
 
 export default class TransactionController {
@@ -120,6 +123,7 @@ export default class TransactionController {
           },
         }
       );
+
       // Handle the transaction status
       const updatedTransaction = await Transaction.findOneAndUpdate(
         { orderId },
@@ -129,7 +133,26 @@ export default class TransactionController {
         },
         { new: true }
       );
+      // console.log(updatedTransaction, "<-- updated transaction");
 
+      //handle sending notification to lawyer
+      if (
+        midtransRes.data.transaction_status === "settlement" &&
+        updatedTransaction?.lawyerId
+      ) {
+        const lawyerUser = await User.findById(updatedTransaction.lawyerId);
+
+        // console.log(lawyerUser, "<-- lawyer user found");
+        // console.log(lawyerUser?.pushToken, "<-- lawyer user push token");
+
+        if (lawyerUser?.pushToken?.startsWith("ExponentPushToken")) {
+          await PushNotificationService.sendNotification(
+            lawyerUser.pushToken,
+            "New Paid Transaction",
+            "You just received a new paid transaction from a client!"
+          );
+        }
+      }
       if (!updatedTransaction) {
         return res.status(404).json({
           status: "error",
