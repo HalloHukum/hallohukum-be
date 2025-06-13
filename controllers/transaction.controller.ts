@@ -142,12 +142,9 @@ export default class TransactionController {
       ) {
         const lawyerUser = await User.findById(updatedTransaction.lawyerId);
 
-        // console.log(lawyerUser, "<-- lawyer user found");
-        // console.log(lawyerUser?.pushToken, "<-- lawyer user push token");
-
-        if (lawyerUser?.pushToken?.startsWith("ExponentPushToken")) {
+        if (lawyerUser?.pushTokens && lawyerUser.pushTokens.length > 0) {
           await PushNotificationService.sendNotification(
-            lawyerUser.pushToken,
+            lawyerUser.pushTokens,
             "New Paid Transaction",
             "You just received a new paid transaction from a client!"
           );

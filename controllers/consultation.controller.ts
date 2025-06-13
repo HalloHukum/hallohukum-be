@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 
 import { IUser } from "../interfaces/user.interface";
+import Consultation from "../models/consultation.model";
+import Lawyer from "../models/lawyer.model";
+import User from "../models/user.model";
 import ConsultationService from "../services/consultation.service";
+import PushNotificationService from "../services/notification.service";
 
 export interface AuthenticatedRequest extends Request {
   user?: IUser;
@@ -272,16 +276,36 @@ export default class ConsultationController {
           message: "Unauthorized - User not authenticated",
         });
       }
+
+      const lawyerId = req.body.lawyerId;
       const durationMinutes = req.body.durationMinutes || 60;
       const expiredAt = await ConsultationService.getExpiredAt(durationMinutes); // output:
 
       const consultation = await ConsultationService.createConsultation({
         ...req.body,
         userId: req.user._id,
-        status: "active",
+        lawyerId,
+        status: "pending",
         durationMinutes,
         expiredAt,
       });
+
+      const lawyer = await Lawyer.findById(lawyerId).populate("userId");
+      if (
+        lawyer &&
+        lawyer.userId &&
+        typeof lawyer.userId === "object" &&
+        "pushTokens" in lawyer.userId
+      ) {
+        const user = lawyer.userId as unknown as IUser;
+        if (user.pushTokens && user.pushTokens.length > 0) {
+          await PushNotificationService.sendNotification(
+            user.pushTokens,
+            "Permintaan Konsultasi Baru!",
+            `Client mengajukan konsultasi!.`
+          );
+        }
+      }
       res.status(201).json({
         status: "success",
         message: "Consultation created successfully",
@@ -536,6 +560,49 @@ export default class ConsultationController {
       res.status(500).json({
         status: "error",
         message: error.message,
+      });
+    }
+  }
+
+  static async respondConsultation(req: AuthenticatedRequest, res: Response) {
+    try {
+      if (!req.user?._id) {
+        return res.status(401).json({
+          status: "error",
+          message: "Unauthorized - User not authenticated",
+        });
+      }
+      const { consultationId, action } = req.body;
+
+      if (!["accept", "decline"].includes(action)) {
+        return res.status(400).json({ message: "Invalid action" });
+      }
+
+      const consultation = await Consultation.findById(consultationId);
+      if (!consultation) {
+        return res.status(404).json({ message: "Consultation not found" });
+      }
+
+      consultation.status = action === "accept" ? "accepted" : "declined";
+      await consultation.save();
+
+      // Optional: send notif ke client
+      const client = await User.findById(consultation.userId);
+      if (client?.pushTokens && client.pushTokens.length > 0) {
+        await PushNotificationService.sendNotification(
+          client.pushTokens,
+          "Status Konsultasi",
+          `Konsultasi kamu telah di-${action === "accept" ? "terima" : "tolak"}`
+        );
+      }
+
+      res.status(200).json({ status: "success", data: consultation });
+    } catch (error) {
+      console.error("Error in respondConsultation:", error);
+      res.status(500).json({
+        status: "error",
+        message:
+          error instanceof Error ? error.message : "Internal server error",
       });
     }
   }

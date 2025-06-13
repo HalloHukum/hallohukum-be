@@ -56,10 +56,22 @@ const consultationSchema: Schema<IConsultation> = new Schema(
       type: String,
       required: true,
     },
+    orderId: {
+      type: String,
+      required: false, // diisi setelah user bayar
+    },
     status: {
       type: String,
       required: true,
-      enum: ["active", "expired"],
+      enum: [
+        "pending",
+        "accepted",
+        "declined",
+        "paid",
+        "active",
+        "expired",
+        "done",
+      ],
     },
     price: {
       type: Number,
