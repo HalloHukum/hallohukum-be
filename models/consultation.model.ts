@@ -19,6 +19,11 @@ const consultationSchema: Schema<IConsultation> = new Schema(
       required: true,
       ref: "Category",
     },
+    reviewId: {
+      type: Schema.Types.ObjectId,
+      ref: "Review",
+      default: null,
+    },
     problemDescription: {
       type: String,
       required: true,
@@ -67,6 +72,10 @@ const consultationSchema: Schema<IConsultation> = new Schema(
         "expired",
         "done",
       ],
+    },
+    price: {
+      type: Number,
+      min: 0,
     },
   },
   { timestamps: true }

@@ -14,6 +14,11 @@ const reviewSchema: Schema<IReview> = new Schema(
       required: true,
       ref: "Lawyer",
     },
+    consultationId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Consultation",
+    },
     rating: {
       type: Number,
       required: true,

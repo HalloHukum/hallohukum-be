@@ -26,6 +26,7 @@ interface LawyerData {
 export interface IReview extends Document {
   userId: UserData;
   lawyerId: LawyerData;
+  consultationId: Types.ObjectId;
   rating: number;
   date: Date;
   comment: string;

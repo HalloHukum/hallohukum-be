@@ -644,6 +644,8 @@ export default class AuthController {
     }
   }
 
+  // upload
+
   /**
    * @swagger
    * /verify-login-otp:
