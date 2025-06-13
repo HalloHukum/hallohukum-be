@@ -5,7 +5,12 @@ import Consultation from "../models/consultation.model";
 import Lawyer from "../models/lawyer.model";
 import User from "../models/user.model";
 import ConsultationService from "../services/consultation.service";
+
+import Lawyer from "../models/lawyer.model";
 import PushNotificationService from "../services/notification.service";
+import Consultation from "../models/consultation.model";
+import User from "../models/user.model";
+
 
 export interface AuthenticatedRequest extends Request {
   user?: IUser;
@@ -281,7 +286,7 @@ export default class ConsultationController {
       const durationMinutes = req.body.durationMinutes || 60;
       const expiredAt = await ConsultationService.getExpiredAt(durationMinutes); // output:
 
-      const consultation = await ConsultationService.createConsultation({
+      const consultation: any = await ConsultationService.createConsultation({
         ...req.body,
         userId: req.user._id,
         lawyerId,
@@ -289,6 +294,11 @@ export default class ConsultationController {
         durationMinutes,
         expiredAt,
       });
+
+      // console.log(consultation?._id.toString(), "<-- nih dari si response create transaction");
+      const consultationId = consultation?._id.toString();
+      // console.log(consultationId, "<-- consultation id nihh")
+
 
       const lawyer = await Lawyer.findById(lawyerId).populate("userId");
       if (
@@ -302,8 +312,16 @@ export default class ConsultationController {
           await PushNotificationService.sendNotification(
             user.pushTokens,
             "Permintaan Konsultasi Baru!",
-            `Client mengajukan konsultasi!.`
+
+            `Client mengajukan konsultasi!.`,
+            {
+              data: {
+                consultationId: consultationId,
+              },
+            }
           );
+          // console.log(notifResp, "<-- notif look like")
+
         }
       }
       res.status(201).json({

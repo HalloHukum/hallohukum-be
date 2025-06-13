@@ -15,7 +15,6 @@ export interface IConsultation extends Document {
   disclaimer: string;
   durationMinutes: number;
   expiredAt: string;
-
   orderId?: string;
   status:
     | "pending"
@@ -25,6 +24,7 @@ export interface IConsultation extends Document {
     | "active"
     | "expired"
     | "done";
+
 
   price: number;
 

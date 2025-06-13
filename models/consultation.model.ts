@@ -72,6 +72,7 @@ const consultationSchema: Schema<IConsultation> = new Schema(
         "expired",
         "done",
       ],
+
     },
     price: {
       type: Number,
