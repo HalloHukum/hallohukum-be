@@ -1,8 +1,11 @@
 import axios from "axios";
 import User from "../models/user.model";
 
+import User from "../models/user.model";
+
 class PushNotificationService {
   private static API_URL = "https://exp.host/--/api/v2/push/send";
+
 
   static async sendNotification(
     tokens: string[],
@@ -10,6 +13,7 @@ class PushNotificationService {
     body: string,
     options?: { data?: Record<string, any> }
   ): Promise<any> {
+
     const validTokens = tokens.filter((token) =>
       token.startsWith("ExponentPushToken")
     );
@@ -25,18 +29,22 @@ class PushNotificationService {
         to: token,
         title,
         body,
+
         data: options?.data,
         sound: "default",
       }));
 
       const res = await axios.post(this.API_URL, notifications, {
+
         headers: {
           Accept: "application/json",
           "Accept-encoding": "gzip, deflate",
           "Content-Type": "application/json",
         },
       });
+
       return res.data;
+
     } catch (error) {
       console.error("Error sending push notifications:", error);
     }

@@ -24,6 +24,10 @@ export interface IConsultation extends Document {
     | "active"
     | "expired"
     | "done";
+
+
+  price: number;
+
   createdAt: Date;
   updatedAt: Date;
 }
