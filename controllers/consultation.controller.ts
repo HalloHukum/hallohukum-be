@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import { IUser } from "../interfaces/user.interface";
+
 import Consultation from "../models/consultation.model";
 import Lawyer from "../models/lawyer.model";
 import User from "../models/user.model";
@@ -8,8 +9,12 @@ import ConsultationService from "../services/consultation.service";
 
 import Lawyer from "../models/lawyer.model";
 import PushNotificationService from "../services/notification.service";
+
 import Consultation from "../models/consultation.model";
+import Lawyer from "../models/lawyer.model";
 import User from "../models/user.model";
+import ConsultationService from "../services/consultation.service";
+import PushNotificationService from "../services/notification.service";
 
 
 export interface AuthenticatedRequest extends Request {
@@ -853,6 +858,107 @@ export default class ConsultationController {
       res.status(200).json({
         status: "success",
         message: "Consultation ended successfully",
+        data: consultation,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * @swagger
+   * /consultations/{id}/chat:
+   *   patch:
+   *     summary: Update consultation chat channel
+   *     tags: [Consultations]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Consultation ID
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - chatId
+   *             properties:
+   *               chatId:
+   *                 type: string
+   *                 description: The chat channel ID to associate with the consultation
+   *     responses:
+   *       200:
+   *         description: Chat channel updated successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ConsultationResponse'
+   *       401:
+   *         description: Unauthorized
+   *       403:
+   *         description: Forbidden
+   *       404:
+   *         description: Consultation not found
+   */
+  static async updateConsultationChatChannel(
+    req: AuthenticatedRequest,
+    res: Response
+  ) {
+    try {
+      if (!req.user?._id) {
+        return res.status(401).json({
+          status: "error",
+          message: "Unauthorized - User not authenticated",
+        });
+      }
+
+      const { chatId } = req.body;
+      if (!chatId) {
+        return res.status(400).json({
+          status: "error",
+          message: "Chat ID is required",
+        });
+      }
+
+      // Check if user has access to this consultation
+      const isOwner = await ConsultationService.isConsultationOwner(
+        req.params.id,
+        req.user._id.toString(),
+        req.user.role === "lawyer"
+      );
+
+      if (!isOwner) {
+        return res.status(403).json({
+          status: "error",
+          message: "You don't have access to this consultation",
+        });
+      }
+
+      const consultation =
+        await ConsultationService.updateConsultationChatChannel(
+          req.params.id,
+          chatId
+        );
+
+      if (!consultation) {
+        return res.status(404).json({
+          status: "error",
+          message: "Consultation not found",
+        });
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: "Consultation chat channel updated successfully",
         data: consultation,
       });
     } catch (error: any) {
