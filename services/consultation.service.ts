@@ -171,4 +171,26 @@ export default class ConsultationService {
 
     return consultation;
   }
+
+  static async updateConsultationChatChannel(
+    id: string,
+    chatId: string
+  ): Promise<IConsultation | null> {
+    return await Consultation.findByIdAndUpdate(id, { chatId }, { new: true })
+      .populate({
+        path: "userId",
+        select: "_id fullName email role",
+      })
+      .populate({
+        path: "lawyerId",
+        select:
+          "_id specialization yearsOfExperience certifications qualification about image isVerified status price totalConsults",
+        populate: {
+          path: "userId",
+          select: "_id fullName email role",
+        },
+      })
+      .populate("categoryId", "_id title")
+      .populate("reviewId", "comment rating date");
+  }
 }
